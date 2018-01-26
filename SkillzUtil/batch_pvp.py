@@ -1,13 +1,13 @@
 import re
 import time
 
-from SkillzUtil.Constants import *
-from SkillzUtil.Game import *
-from SkillzUtil.Util import *
+from SkillzUtil.constants import *
+from SkillzUtil.game import *
+from SkillzUtil.util import *
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from SkillzUtil.Group import *
+from SkillzUtil.group import *
 
 
 def run(out, selector):

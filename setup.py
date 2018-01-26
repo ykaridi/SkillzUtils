@@ -12,6 +12,6 @@ setup(name='SkillzUtil',
           'argparse'
       ],
       entry_points={
-          'console_scripts': ['SkillzUtil = SkillzUtil.CLI:main'],
+          'console_scripts': ['SkillzUtil = SkillzUtil.cli:main'],
       },
       zip_safe=False)
