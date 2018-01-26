@@ -11,7 +11,6 @@ setup(name='SkillzUtil',
           'selenium',
           'argparse'
       ],
-      scripts=['bin/SkillzUtil'],
       entry_points={
           'console_scripts': ['SkillzUtil = SkillzUtil.CLI:main'],
       },
