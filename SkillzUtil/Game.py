@@ -1,5 +1,4 @@
 import json
-from Constants import *
 
 
 class Game(object):

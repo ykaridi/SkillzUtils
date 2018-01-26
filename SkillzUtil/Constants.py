@@ -1,0 +1,1 @@
+baseURL = "https://piratez.skillz-edu.org/"
