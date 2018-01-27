@@ -1,7 +1,6 @@
 import re
 import time
 
-from SkillzUtil.constants import *
 from SkillzUtil.game import *
 from SkillzUtil.util import *
 from selenium.webdriver.support import expected_conditions as EC
@@ -11,18 +10,11 @@ from SkillzUtil.group import *
 
 
 def run(out, selector):
-    driver = new_chrome_driver(with_images=False)
+    driver = new_tournament_driver()
+    driver.get(driver.find_element_by_css_selector("a#menu_button_scores").get_attribute("href"))
 
     def run_game(gid):
         driver.execute_script("$('#vs').val('" + gid + "'); $('form').submit();")
-
-    driver.get(baseURL)
-    try:
-        WebDriverWait(driver, 60).until(
-            EC.url_matches(".*/scores")
-        )
-    except:
-        return False
 
     gid = driver.find_element_by_css_selector("#group").get_attribute("value")
 

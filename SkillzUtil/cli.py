@@ -1,9 +1,12 @@
 from SkillzUtil import batch_pvp
 import argparse
 import random
+import SkillzUtil.config as config
+
 
 def configure_help(parser):
     parser.set_defaults(func=lambda x: parser.parse_args(["-h"]))
+
 
 def main():
     def create_parser():
@@ -28,11 +31,25 @@ def main():
             define_sample(subparsers.add_parser('sample'))
             configure_help(parser)
 
+        def define_config(parser):
+            def config_action(args):
+                config.append_to_config("email", args.email)
+                config.append_to_config("passwrd", args.password)
+                config.append_to_config("tournament_number", args.tournament)
+
+            parser.add_argument("email", type=str)
+            parser.add_argument("password", type=str)
+            parser.add_argument("tournament", type=int)
+            parser.add_argument("-hf", "--headless", dest="headfull", action='store_const',
+                                const=False, default=True)
+            parser.set_defaults(func=config_action)
+
         parser = argparse.ArgumentParser(prog='SkillzUtil.py')
         subparsers = parser.add_subparsers(title='subcommands',
                                            description='valid subcommands')
 
         define_run_games(subparsers.add_parser('run-games'))
+        define_config(subparsers.add_parser('config'))
         configure_help(parser)
         return parser
 
