@@ -9,7 +9,8 @@ setup(name='SkillzUtil',
       packages=['SkillzUtil'],
       install_requires=[
           'selenium',
-          'argparse'
+          'argparse',
+          'subargparse'
       ],
       entry_points={
           'console_scripts': ['SkillzUtil = SkillzUtil.cli:main'],

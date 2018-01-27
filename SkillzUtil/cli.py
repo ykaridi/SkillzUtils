@@ -1,50 +1,14 @@
 from SkillzUtil import batch_pvp
 import argparse
 import random
-import SkillzUtil.config as config
+from SkillzUtil.util import *
+import subargparse
+
+subparsers = subargparse.subparser_decorator()
 
 
-def make_registrar():
-    registry = {}
-
-    def get_entry(d, *path):
-        if isinstance(path[0], list) or isinstance(path[0], tuple):
-            path = path[0]
-        entry = d
-        for k in path:
-            if k in entry:
-                entry = entry[k]
-            else:
-                return None
-        return entry
-
-    def set_entry(d, v, *path):
-        if isinstance(path[0], list) or isinstance(path[0], tuple):
-            path = path[0]
-        entry = d
-        for k in path[:-1]:
-            if k in entry:
-                entry = entry[k]
-            else:
-                entry[k] = {}
-                entry = entry[k]
-        entry[path[-1]] = v
-
-    def registrar(*path):
-        def wrapper(func):
-            set_entry(registry, func, path)
-            return func     # normally a decorator returns a wrapped function,
-                            # but here we return func unmodified, after registering it
-        return wrapper
-    registrar.all = registry
-    return registrar
-
-
-subparsers = make_registrar()
-
-
-@subparsers("run-games", "sample")
-def run_games_sample(parser):
+@subparsers("run-games")
+def sample(parser):
     def action(args):
         args.sample_size = getattr(args, "sample-size")
 
@@ -61,7 +25,7 @@ def run_games_sample(parser):
     return action
 
 
-@subparsers("config")
+@subparsers()
 def config(parser):
     def action(args):
         config.append_to_config("email", args.email)
@@ -79,22 +43,7 @@ def config(parser):
 
 
 def main():
-    def configure_help(parser, path):
-        parser.set_defaults(func=lambda x: parser.parse_args(reversed(path + ["-h"])))
-
-    def configure_parser(d, parser, path):
-        configure_help(parser, path)
-        sps = parser.add_subparsers(title='subcommands',
-                              description='valid subcommands')
-        for k,v in d.items():
-            if isinstance(v, dict):
-                lp = sps.add_parser(k)
-                configure_parser(v, lp, path + [k])
-            else:
-                lp = sps.add_parser(k)
-                action = v(lp)
-                lp.set_defaults(func=action)
     parser = argparse.ArgumentParser(prog='SkillzUtil')
-    configure_parser(subparsers.all, parser, ["SkillzUtil"])
+    subparsers.bind(parser)
     args = parser.parse_args()
-    args.func(args)
+    parser.handle(args)
