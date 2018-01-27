@@ -25,3 +25,6 @@ class Game(object):
 
     def get_link(self):
         return self.link
+
+    def __repr__(self):
+        return "<" + self.get_players()[0] + " vs. " + self.get_players()[1] + "; " + self.get_score() + ">"

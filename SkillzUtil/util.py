@@ -14,6 +14,12 @@ def new_chrome_driver(with_images=False, headless=False, no_sounds=True):
     def set_value(self, element, v):
         self.execute_script("arguments[0].value=arguments[1]", element, v)
 
+    def element_by_css_selector(self, selector):
+        return WebDriverWait(self, config.soft_timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, selector)))
+
+    def element_by_id(self, element_id):
+        return WebDriverWait(self, config.soft_timeout).until(EC.presence_of_element_located((By.ID, element_id)))
+
     options = webdriver.ChromeOptions()
     prefs = {}
     if not with_images:
@@ -26,19 +32,21 @@ def new_chrome_driver(with_images=False, headless=False, no_sounds=True):
     driver = webdriver.Chrome(options=options)
     driver.set_attribute = set_attribute.__get__(driver, driver.__class__)
     driver.set_value = set_value.__get__(driver, driver.__class__)
+    driver.element_by_css_selector = element_by_css_selector.__get__(driver, driver.__class__)
+    driver.element_by_id = element_by_id.__get__(driver, driver.__class__)
     return driver
 
 
 def new_authenticated_tournament_driver(email, passwrd):
     driver = new_chrome_driver(with_images=False, headless=True)
     driver.get(config.baseURL)
-    email_input = WebDriverWait(driver, config.soft_timeout).until(EC.presence_of_element_located((By.ID, 'id_email')))
-    passwrd_input = WebDriverWait(driver, config.soft_timeout).until(EC.presence_of_element_located((By.ID, 'id_password')))
+    email_input = driver.element_by_id("id_email")
+    passwrd_input = driver.element_by_id("id_password")
     driver.set_value(email_input, email)
     driver.set_value(passwrd_input, passwrd)
     passwrd_input.submit()
     driver.get("https://piratez.skillz-edu.org/home/")
-    tournament_btn = WebDriverWait(driver, config.soft_timeout).until(EC.presence_of_element_located((By.ID, "tournament_button_" + str(config.tournament_number))))
+    tournament_btn = driver.element_by_id("tournament_button_" + str(config.tournament_number))
     tournament_btn.submit()
     return driver
 
