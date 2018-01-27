@@ -24,7 +24,7 @@ def main():
 
                 parser.add_argument('sample-size', type=int, help='The number of rounds to sample')
                 parser.add_argument('--selector', choices=['random', 'top'], default='random')
-                parser.add_argument('--log', type=str, required=True)
+                parser.add_argument('--log', type=str, required=True, help="Log file path")
                 parser.set_defaults(func=sample_action)
             subparsers = parser.add_subparsers(title='subcommands',
                                            description='valid subcommands')
@@ -36,12 +36,14 @@ def main():
                 config.append_to_config("email", args.email)
                 config.append_to_config("passwrd", args.password)
                 config.append_to_config("tournament_number", args.tournament)
+                config.append_to_config("headless", args.headless)
 
             parser.add_argument("email", type=str)
             parser.add_argument("password", type=str)
-            parser.add_argument("tournament", type=int)
-            parser.add_argument("-hf", "--headless", dest="headfull", action='store_const',
-                                const=False, default=True)
+            parser.add_argument("tournament", type=int,
+                                help="The index of the tournament in your current tournaments list")
+            parser.add_argument("-hf", "--headless", dest="headless", action='store_const',
+                                const=False, default=True, help="Run chrome in headless mode when possible")
             parser.set_defaults(func=config_action)
 
         parser = argparse.ArgumentParser(prog='SkillzUtil.py')

@@ -24,7 +24,7 @@ def new_chrome_driver(with_images=False, headless=False, no_sounds=True):
     prefs = {}
     if not with_images:
         prefs["profile.managed_default_content_settings.images"] = 2
-    if headless and (not config.headfull):
+    if headless and config.headless:
         options.add_argument('headless')
     if no_sounds:
         options.add_argument("--mute-audio")

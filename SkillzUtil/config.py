@@ -8,7 +8,7 @@ hard_timeout = 180
 email = ""
 passwrd = ""
 tournament_number = 0
-headfull = False
+headless = True
 
 
 def fetch_config():
