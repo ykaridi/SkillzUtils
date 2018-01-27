@@ -68,7 +68,7 @@ def new_tournament_driver():
 
 
 def to_csv(path, arr, attributes):
-    with open(path, "w") as f:
+    with open(path, "w", encoding='utf-8') as f:
         wr = csv.writer(f, delimiter=",")
         wr.writerow(attributes.keys())
         for elem in arr:

@@ -43,7 +43,7 @@ def main():
             parser.add_argument("tournament", type=int,
                                 help="The index of the tournament in your current tournaments list")
             parser.add_argument("-hf", "--headless", dest="headless", action='store_const',
-                                const=False, default=True, help="Run chrome in headless mode when possible")
+                                const=True, default=False, help="Run chrome in headless mode when possible")
             parser.set_defaults(func=config_action)
 
         parser = argparse.ArgumentParser(prog='SkillzUtil.py')
