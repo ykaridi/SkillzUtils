@@ -2,11 +2,14 @@ import json
 import os
 
 baseURL = "https://piratez.skillz-edu.org/"
+batch_size=5
 config_location = os.path.join(os.path.expanduser("~"), ".SkillzUtil.conf")
 soft_timeout = 30
 hard_timeout = 180
-email = ""
-passwrd = ""
+user = ""
+password = ""
+connection_type = ""
+authenticate = False
 tournament_number = 0
 headless = True
 
@@ -27,8 +30,15 @@ def append_to_config(k,v):
     try:
         j = fetch_config()
         j[k] = v
+        write_to_config(j)
+    finally:
+        pass
+
+
+def write_to_config(dict):
+    try:
         with open(config_location, "w") as config_file:
-            config_file.write(json.dumps(j))
+            config_file.write(json.dumps(dict))
         return fetch_config()
     finally:
         pass

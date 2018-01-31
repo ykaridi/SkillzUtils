@@ -37,23 +37,38 @@ def new_chrome_driver(with_images=False, headless=False, no_sounds=True):
     return driver
 
 
-def new_authenticated_tournament_driver(email, passwrd):
+def new_authenticated_tournament_driver(user, password, connection_type):
     driver = new_chrome_driver(with_images=False, headless=True)
-    driver.get(config.baseURL)
-    email_input = driver.element_by_id("id_email")
-    passwrd_input = driver.element_by_id("id_password")
-    driver.set_value(email_input, email)
-    driver.set_value(passwrd_input, passwrd)
-    passwrd_input.submit()
-    driver.get("https://piratez.skillz-edu.org/home/")
-    tournament_btn = driver.element_by_id("tournament_button_" + str(config.tournament_number))
-    tournament_btn.submit()
-    return driver
+    if connection_type == "idm":
+        driver.get(config.baseURL)
+        driver.get(driver.element_by_id("ministry_of_education_login").get_attribute("href"))
+        usr_input = driver.element_by_id("HIN_USERID")
+        passwrd_input = driver.element_by_id("Ecom_Password")
+        driver.set_value(usr_input, user)
+        driver.set_value(passwrd_input, password)
+        usr_input.submit()
+        driver.get("https://piratez.skillz-edu.org/home/")
+        tournament_btn = driver.element_by_id("tournament_button_" + str(config.tournament_number))
+        tournament_btn.submit()
+        return driver
+    elif connection_type == "local":
+        driver.get(config.baseURL)
+        email_input = driver.element_by_id("id_email")
+        passwrd_input = driver.element_by_id("id_password")
+        driver.set_value(email_input, user)
+        driver.set_value(passwrd_input, password)
+        passwrd_input.submit()
+        driver.get("https://piratez.skillz-edu.org/home/")
+        tournament_btn = driver.element_by_id("tournament_button_" + str(config.tournament_number))
+        tournament_btn.submit()
+        return driver
+
+    raise Exception("Invalid connection type!")
 
 
 def new_tournament_driver():
-    if len(config.email) > 0 and len(config.passwrd) > 0:
-        return new_authenticated_tournament_driver(config.email, config.passwrd)
+    if config.authenticate > 0:
+        return new_authenticated_tournament_driver(config.user, config.password, config.connection_type)
 
     driver = new_chrome_driver(False)
     driver.get(config.baseURL)

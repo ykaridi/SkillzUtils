@@ -30,26 +30,47 @@ def run(out, selector):
     # Prepare form
     driver.set_attribute(driver.element_by_css_selector('form'), "target", "_blank")
 
-    for x in groups:
-        print("\tRunning game #" + str(x.id))
-        run_game(x.id)
-        time.sleep(1)
+    main_handle = driver.current_window_handle
 
-    driver.close()
+    def run_batch(grps):
+        results = []
 
-    handles = driver.window_handles
+        print("Running games...")
+        driver.switch_to.window(main_handle)
+        for x in grps:
+            print("\tRunning game vs " + str(x))
+            run_game(x.id)
+            time.sleep(1)
+
+        handles = [wh for wh in driver.window_handles if wh != main_handle]
+        print("Processing games...")
+        for handle in reversed(handles):
+            driver.switch_to.window(handle)
+            play_link = WebDriverWait(driver, config.hard_timeout).until(
+                EC.visibility_of(driver.element_by_css_selector("#play-link"))
+            )
+            time.sleep(1)
+            driver.get(play_link.get_attribute("href"))
+            g = Game(driver.element_by_css_selector("#replayData").get_attribute("innerHTML"), driver.current_url)
+            results.append(g)
+            print("\tProcessed game " + str(g))
+            driver.close()
+
+        driver.switch_to.window(main_handle)
+
+        return results
+
+    n = len(groups)/config.batch_size
+    if n-int(n) > 0:
+        n += 1
+    n = int(n)
+
     games = []
-    print("Processing games...")
-    for handle in reversed(handles):
-        driver.switch_to.window(handle)
-        play_link = WebDriverWait(driver, config.hard_timeout).until(
-            EC.visibility_of(driver.element_by_css_selector("#play-link"))
-        )
-        driver.get(play_link.get_attribute("href"))
-        g = Game(driver.element_by_css_selector("#replayData").get_attribute("innerHTML"), driver.current_url)
-        games.append(g)
-        print("\tProcessed game " + str(g))
-        driver.close()
+    for i in range(n):
+        print("Running batch [" + str(i*config.batch_size) + ":" + str((i+1)*config.batch_size))
+        games.extend(run_batch(groups[i*config.batch_size:(i+1)*config.batch_size]))
+        time.sleep(5)
+
     driver.quit()
 
     def get_name(group_id):
