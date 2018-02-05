@@ -8,6 +8,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from SkillzUtil.group import *
+from pandas import DataFrame
 
 
 def run(out, buffer, selector):
@@ -71,6 +72,11 @@ def run(out, buffer, selector):
         games.extend(run_batch(groups[i*buffer:(i+1)*buffer]))
         time.sleep(5)
 
+    driver.switch_to.window(main_handle)
+    driver.get(driver.element_by_css_selector("#menu_button_upload").get_attribute("href"))
+    code_link = next((x for x in driver.find_elements_by_css_selector("a") if
+     x.get_attribute("href") is not None and "download" in x.get_attribute("href"))).get_attribute("href")
+
     driver.quit()
 
     def get_name(group_id):
@@ -100,7 +106,8 @@ def run(out, buffer, selector):
                           column_lambdas)
     tiedf = to_dataframe([g for g in games if result_lambda(g) == "Tie"],
                          column_lambdas)
+    code = DataFrame({"Code Link": [code_link]})
 
-    write_excel(excel_path, {"All games": alldf, "Wins": windf, "Losses": losedf, "Ties": tiedf})
+    write_excel(excel_path, {"All games": alldf, "Wins": windf, "Losses": losedf, "Ties": tiedf, "Code": code})
 
     return True
