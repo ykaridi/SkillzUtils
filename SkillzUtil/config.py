@@ -2,7 +2,7 @@ import json
 import os
 
 baseURL = "https://piratez.skillz-edu.org/"
-batch_size=5
+buffer_size=5
 config_location = os.path.join(os.path.expanduser("~"), ".SkillzUtil.conf")
 soft_timeout = 30
 hard_timeout = 180

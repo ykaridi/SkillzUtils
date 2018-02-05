@@ -4,6 +4,8 @@ import SkillzUtil.config as config
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from pandas import DataFrame
+from pandas import ExcelWriter
 
 
 def new_chrome_driver(with_images=False, headless=False, no_sounds=True):
@@ -82,9 +84,34 @@ def new_tournament_driver():
     return driver
 
 
+def to_dataframe(arr, attributes):
+    df = DataFrame(
+        {x: [getattr(row, "get_" + x)() if attributes[x] is None else attributes[x](row) for row in arr] for x in
+         attributes})
+    df = df[list(attributes.keys())]
+    return df
+
+
 def to_csv(path, arr, attributes):
-    with open(path, "w", encoding='utf-8') as f:
-        wr = csv.writer(f, delimiter=",")
-        wr.writerow(attributes.keys())
-        for elem in arr:
-            wr.writerow([getattr(elem, "get_" + x)() if attributes[x] is None else attributes[x](elem) for x in attributes])
+    df = to_dataframe(arr, attributes)
+    df.to_csv(path)
+
+
+def to_excel(path, arr, attributes):
+    df = to_dataframe(arr, attributes)
+    write_excel(path, {"Score Sheet" : df})
+
+
+def write_excel(path, dfs):
+    writer = ExcelWriter(path, engine='xlsxwriter')
+    for sheetname, df in dfs.items():  # loop through `dict` of dataframes
+        df.to_excel(writer, sheet_name=sheetname)  # send df to writer
+        worksheet = writer.sheets[sheetname]  # pull worksheet object
+        for idx, col in enumerate(df):  # loop through all columns
+            series = df[col]
+            max_len = max((
+                series.astype(str).map(len).max(),  # len of largest item
+                len(str(series.name))  # len of column name/header
+            )) + 1  # adding a little extra space
+            worksheet.set_column(idx+1, idx+1, max_len)  # set column width
+    writer.save()

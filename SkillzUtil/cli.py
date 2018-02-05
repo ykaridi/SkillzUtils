@@ -18,10 +18,11 @@ def sample(parser):
             elif args.selector == 'random':
                 return lambda arr: random.sample(arr, args.sample_size)
 
-        batch_pvp.run(args.log, get_selector())
+        batch_pvp.run(args.log, args.buffer, get_selector())
     parser.add_argument('sample-size', type=int, help='The number of rounds to sample')
     parser.add_argument('--selector', choices=['random', 'top'], default='random')
     parser.add_argument('--log', type=str, required=True, help="Log file path")
+    parser.add_argument('--buffer', type=int, required=True, default=configuration.buffer_size)
     return action
 
 

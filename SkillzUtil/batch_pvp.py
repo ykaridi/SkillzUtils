@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from SkillzUtil.group import *
 
 
-def run(out, selector):
+def run(out, buffer, selector):
     print("Starting batch pvp run...")
     driver = new_tournament_driver()
     driver.get(driver.element_by_css_selector("a#menu_button_scores").get_attribute("href"))
@@ -60,15 +60,15 @@ def run(out, selector):
 
         return results
 
-    n = len(groups)/config.batch_size
+    n = len(groups)/buffer
     if n-int(n) > 0:
         n += 1
     n = int(n)
 
     games = []
     for i in range(n):
-        print("Running batch [" + str(i*config.batch_size) + ":" + str((i+1)*config.batch_size))
-        games.extend(run_batch(groups[i*config.batch_size:(i+1)*config.batch_size]))
+        print("Running batch [" + str(i*buffer) + ":" + str((i+1)*buffer) + "]")
+        games.extend(run_batch(groups[i*buffer:(i+1)*buffer]))
         time.sleep(5)
 
     driver.quit()
@@ -76,9 +76,19 @@ def run(out, selector):
     def get_name(group_id):
         return next(g.name for g in groups if g.id == group_id)
 
-    print("Printing to csv @ " + os.path.abspath(out))
+    print("Printing to csv @ " + os.path.abspath(out + ".csv"))
 
-    to_csv(out, games,
+    to_csv(os.path.abspath(out + ".csv"), games,
+           {"opponent": lambda x: get_name(x.get_players()[0] if x.get_players()[0] != gid else x.get_players()[1]),
+            "result": lambda x: "Win" if (x.get_winner() == gid) else ("Tie" if (x.get_winner() == "Tie") else "Lose"),
+            "score": None,
+            "length": None,
+            "link": None}
+           )
+
+    print("Printing to excel @ " + os.path.abspath(out + ".xlsx"))
+
+    to_excel(os.path.abspath(out + ".xlsx"), games,
            {"opponent": lambda x: get_name(x.get_players()[0] if x.get_players()[0] != gid else x.get_players()[1]),
             "result": lambda x: "Win" if (x.get_winner() == gid) else ("Tie" if (x.get_winner() == "Tie") else "Lose"),
             "score": None,

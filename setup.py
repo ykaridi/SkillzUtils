@@ -10,7 +10,9 @@ setup(name='SkillzUtil',
       install_requires=[
           'selenium',
           'argparse',
-          'subargparse'
+          'subargparse',
+          'pandas',
+          'xlsxwriter'
       ],
       entry_points={
           'console_scripts': ['SkillzUtil = SkillzUtil.cli:main'],
