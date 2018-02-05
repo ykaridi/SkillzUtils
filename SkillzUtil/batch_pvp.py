@@ -76,24 +76,31 @@ def run(out, buffer, selector):
     def get_name(group_id):
         return next(g.name for g in groups if g.id == group_id)
 
-    print("Printing to csv @ " + os.path.abspath(out + ".csv"))
+    csv_path = os.path.abspath(out + ".csv")
+    excel_path = os.path.abspath(out + ".xlsx")
 
-    to_csv(os.path.abspath(out + ".csv"), games,
-           {"opponent": lambda x: get_name(x.get_players()[0] if x.get_players()[0] != gid else x.get_players()[1]),
-            "result": lambda x: "Win" if (x.get_winner() == gid) else ("Tie" if (x.get_winner() == "Tie") else "Lose"),
-            "score": None,
-            "length": None,
-            "link": None}
-           )
+    print("Printing to csv @ " + csv_path)
+    column_lambdas = {"opponent": lambda x: get_name(x.get_players()[0] if x.get_players()[0] != gid else x.get_players()[1]),
+                      "result": lambda x: "Win" if (x.get_winner() == gid) else ("Tie" if (x.get_winner() == "Tie") else "Lose"),
+                      "score": None,
+                      "length": None,
+                      "link": None}
+    result_lambda = column_lambdas["result"]
 
-    print("Printing to excel @ " + os.path.abspath(out + ".xlsx"))
+    to_csv(csv_path, games,
+           column_lambdas)
 
-    to_excel(os.path.abspath(out + ".xlsx"), games,
-           {"opponent": lambda x: get_name(x.get_players()[0] if x.get_players()[0] != gid else x.get_players()[1]),
-            "result": lambda x: "Win" if (x.get_winner() == gid) else ("Tie" if (x.get_winner() == "Tie") else "Lose"),
-            "score": None,
-            "length": None,
-            "link": None}
-           )
+    print("Printing to excel @ " + excel_path)
+
+    alldf = to_dataframe(games,
+                         column_lambdas)
+    windf = to_dataframe([g for g in games if result_lambda(g) == "Win"],
+                         column_lambdas)
+    losedf = to_dataframe([g for g in games if result_lambda(g) == "Lose"],
+                          column_lambdas)
+    tiedf = to_dataframe([g for g in games if result_lambda(g) == "Tie"],
+                         column_lambdas)
+
+    write_excel(excel_path, {"All games": alldf, "Wins": windf, "Losses": losedf, "Ties": tiedf})
 
     return True

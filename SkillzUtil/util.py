@@ -99,7 +99,7 @@ def to_csv(path, arr, attributes):
 
 def to_excel(path, arr, attributes):
     df = to_dataframe(arr, attributes)
-    write_excel(path, {"Score Sheet" : df})
+    write_excel(path, {"Score Sheet": df})
 
 
 def write_excel(path, dfs):
